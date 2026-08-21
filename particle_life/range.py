@@ -21,7 +21,9 @@ class Rectangle:
         w, h = self.scale
         xr, yr = _range.position
         wr, hr = _range.scale
-        return not (xr - wr > x + w or xr + wr < x - w or yr - hr > y + h or yr + hr < y - h)
+        return not (
+            xr - wr > x + w or xr + wr < x - w or yr - hr > y + h or yr + hr < y - h
+        )
 
     def draw(self, screen):
         x, y = self.position
@@ -62,4 +64,6 @@ class Circle:
         return edges <= self.sqradius
 
     def draw(self, screen):
-        pg.draw.circle(screen, self.color, self.position, self.radius, self.lineThickness)
+        pg.draw.circle(
+            screen, self.color, self.position, self.radius, self.lineThickness
+        )

@@ -1,7 +1,8 @@
 import pygame as pg
 from pygame.math import Vector2
-from range import Rectangle
-from Particle import Particle
+
+from particle_life.Particle import Particle
+from particle_life.range import Rectangle
 
 
 class Quadtree:
@@ -16,13 +17,27 @@ class Quadtree:
     def subdivide(self):
         parent = self.boundary
 
-        boundary_nw = Rectangle(Vector2(parent.position.x, parent.position.y), parent.scale / 2)
+        boundary_nw = Rectangle(
+            Vector2(parent.position.x, parent.position.y), parent.scale / 2
+        )
 
-        boundary_ne = Rectangle(Vector2(parent.position.x + parent.scale.x / 2, parent.position.y), parent.scale / 2)
+        boundary_ne = Rectangle(
+            Vector2(parent.position.x + parent.scale.x / 2, parent.position.y),
+            parent.scale / 2,
+        )
 
-        boundary_sw = Rectangle(Vector2(parent.position.x, parent.position.y + parent.scale.y / 2), parent.scale / 2)
+        boundary_sw = Rectangle(
+            Vector2(parent.position.x, parent.position.y + parent.scale.y / 2),
+            parent.scale / 2,
+        )
 
-        boundary_se = Rectangle(Vector2(parent.position.x + parent.scale.x / 2, parent.position.y + parent.scale.y / 2), parent.scale / 2)
+        boundary_se = Rectangle(
+            Vector2(
+                parent.position.x + parent.scale.x / 2,
+                parent.position.y + parent.scale.y / 2,
+            ),
+            parent.scale / 2,
+        )
 
         self.northWest = Quadtree(self.capacity, boundary_nw)
         self.northEast = Quadtree(self.capacity, boundary_ne)
@@ -42,10 +57,12 @@ class Quadtree:
         if not self.divided:
             self.subdivide()
 
-        return (self.northWest.insert(particle) or
-                self.northEast.insert(particle) or
-                self.southWest.insert(particle) or
-                self.southEast.insert(particle))
+        return (
+            self.northWest.insert(particle)
+            or self.northEast.insert(particle)
+            or self.southWest.insert(particle)
+            or self.southEast.insert(particle)
+        )
 
     def queryRange(self, _range: Rectangle, found: list = None):
         if found is None:

@@ -17,3 +17,16 @@ def force_func(r: float, a: float) -> float:
     elif beta < r < 1:
         return a * (1 - abs(2 * r - 1 - beta) / (1 - beta))
     return 0
+
+
+def timer(function):
+    from time import perf_counter
+
+    def wrapper(*args, **kwargs):
+        before = perf_counter()
+        value = function(*args, **kwargs)
+        after = perf_counter()
+        print(f"'{function.__name__}' took {after - before} seconds to execute!")
+        return value
+
+    return wrapper
