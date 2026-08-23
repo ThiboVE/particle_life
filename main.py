@@ -1,35 +1,29 @@
 import numpy as np
-from pygame.math import Vector2
 
-from particle_life import Particle, SoftwareRender
+from particle_life import ParticleSystem, SoftwareRender
 
 
 def main() -> None:
-    num_particles = 100
+    num_particles = 500
     num_colours = 5
     radius = 3
 
-    attraction_matrix = np.array(
-        [
-            [np.random.choice(np.arange(-1, 1, 0.2)) for _ in range(num_colours)]
-            for _ in range(num_colours)
-        ]
+    positions = np.random.rand(num_particles, 2)
+    velocities = np.random.rand(num_particles, 2)
+    colours = np.random.randint(0, num_colours, size=(num_particles,))
+
+    attraction_matrix = np.random.uniform(-1, 1, size=(num_colours, num_colours))
+
+    colour_pairs = attraction_matrix[colours[:, None], colours[None, :]]
+
+    particle_system = ParticleSystem(
+        positions=positions,
+        velocities=velocities,
+        colours=colours,
+        colour_pairs=colour_pairs,
     )
 
-    particles = [
-        Particle(
-            position=Vector2(
-                np.random.choice(np.arange(0, 1, 0.01)),
-                np.random.choice(np.arange(0, 1, 0.01)),
-            ),
-            velocity=Vector2(0, 0),
-            radius=radius,
-            colour=np.random.choice(np.arange(0, num_colours, 1)),
-        )
-        for _ in range(num_particles)
-    ]
-
-    app = SoftwareRender(matrix=attraction_matrix, particles=particles)
+    app = SoftwareRender(particle_system=particle_system)
     app.run()
 
 
