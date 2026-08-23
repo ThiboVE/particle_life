@@ -6,24 +6,22 @@ import numpy as np
 @dataclass
 class ForceSettings:
     dt: float = 0.02
-    rMax: float = 0.1
+    r_max: float = 0.15
     frictionHalfLife: float = 0.040
     frictionFactor: float = pow(0.5, dt / frictionHalfLife)
     forceFactor: int = 40
 
 
-# def force_func(r: float, a: float) -> float:
-#     beta = 0.3
-#     if r < beta:
-#         return (r / beta) - 1
-#     elif beta < r < 1:
-#         return a * (1 - abs(2 * r - 1 - beta) / (1 - beta))
-#     return 0
-
-
 def force_func(
     dist: np.ndarray, interaction: np.ndarray, beta: float = 0.3
 ) -> np.ndarray:
+    """
+    if dist < beta:
+        return (dist / beta) - 1
+    elif beta < dist < 1:
+        return interaction * (1 - abs(2 * dist - 1 - beta) / (1 - beta))
+    return 0
+    """
     close_range = dist < beta
     mid_range = (dist >= beta) & (dist < 1)
 
@@ -44,8 +42,7 @@ def compute_forces(
     dist = np.linalg.norm(diff, axis=-1)  # (N, N)
     dist_safe = np.where(dist < min_dist, min_dist, dist)
 
-    r_max = 0.15
-    r_scaled = dist_safe / r_max
+    r_scaled = dist_safe / ForceSettings.r_max
 
     force_mag = force_func(r_scaled, type_pairs, beta)
     np.fill_diagonal(force_mag, 0.0)

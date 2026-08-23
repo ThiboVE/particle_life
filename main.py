@@ -6,7 +6,6 @@ from particle_life import ParticleSystem, SoftwareRender
 def main() -> None:
     num_particles = 500
     num_colours = 5
-    radius = 3
 
     positions = np.random.rand(num_particles, 2)
     velocities = np.random.rand(num_particles, 2)
