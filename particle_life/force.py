@@ -38,7 +38,7 @@ def compute_forces(
     beta: float = 0.3,
 ) -> np.ndarray:
     diff = positions[None, :, :] - positions[:, None, :]  # (N, N, 2)
-    # diff -= np.round(diff)
+    diff -= np.round(diff)
     dist = np.linalg.norm(diff, axis=-1)  # (N, N)
     dist_safe = np.where(dist < min_dist, min_dist, dist)
 
