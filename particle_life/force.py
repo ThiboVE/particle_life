@@ -50,16 +50,3 @@ def compute_forces(
     direction = diff / dist_safe[..., None]  # (N, N, 2)
     force = (direction * force_mag[..., None]).sum(axis=1)  # (N, 2)
     return force
-
-
-def timer(function):
-    from time import perf_counter
-
-    def wrapper(*args, **kwargs):
-        before = perf_counter()
-        value = function(*args, **kwargs)
-        after = perf_counter()
-        print(f"'{function.__name__}' took {after - before} seconds to execute!")
-        return value
-
-    return wrapper
