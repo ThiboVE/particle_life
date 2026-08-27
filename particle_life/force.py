@@ -12,11 +12,10 @@ class ForceSettings:
     forceFactor: int = 40
 
 
-def force_func(
-    dist: np.ndarray, interaction: np.ndarray, beta: float = 0.3
-) -> np.ndarray:
-    """
-    if dist < beta:
+def force_func(dist: np.ndarray, interaction: np.ndarray, beta: float = 0.3) -> np.ndarray:
+    """This function implements the following force function.
+
+    If dist < beta:
         return (dist / beta) - 1
     elif beta < dist < 1:
         return interaction * (1 - abs(2 * dist - 1 - beta) / (1 - beta))

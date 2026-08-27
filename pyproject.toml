@@ -1,12 +1,27 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm", "cython"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "particle-life"
 version = "0.1.0"
-description = "Add your description here"
+description = "Implementation of the particle life game in Python"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "matplotlib>=3.11.1",
     "numpy>=2.5.2",
     "pygame>=2.6.1",
+]
+
+[project.optional-dependencies]
+testing = [
+    "pytest"
+]
+
+linting = [
+    "ruff",
+    "pre-commit",
 ]
 
 [tool.setuptools.packages.find]
