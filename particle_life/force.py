@@ -66,7 +66,6 @@ def test_cell_grid() -> None:
     cell_ids = cell_coords[:, 0] * num_cells + cell_coords[:, 1]
 
     order = np.argsort(cell_ids)
-
     sorted_cell_ids = cell_ids[order]
 
     cell_starts = np.searchsorted(sorted_cell_ids, np.arange(num_cells**2), side="left")
