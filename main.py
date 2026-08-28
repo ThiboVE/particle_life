@@ -1,6 +1,6 @@
 import numpy as np
 
-from particle_life import ParticleSystem, SoftwareRender
+from particle_life import ParticleSystem
 
 
 def main() -> None:
@@ -15,6 +15,8 @@ def main() -> None:
 
     colour_pairs = attraction_matrix[colours[:, None], colours[None, :]]
 
+    print(colour_pairs.shape)
+
     particle_system = ParticleSystem(
         positions=positions,
         velocities=velocities,
@@ -22,8 +24,8 @@ def main() -> None:
         colour_pairs=colour_pairs,
     )
 
-    app = SoftwareRender(particle_system=particle_system)
-    app.run()
+    # app = SoftwareRender(particle_system=particle_system)
+    # app.run()
 
 
 if __name__ == "__main__":

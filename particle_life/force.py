@@ -1,6 +1,10 @@
+import timeit
 from dataclasses import dataclass
 
+import matplotlib.pyplot as plt
 import numpy as np
+
+from particle_life.CellList import CellList
 
 
 @dataclass
@@ -35,7 +39,7 @@ def compute_forces(
     type_pairs: np.ndarray,
     beta: float = 0.3,
 ) -> np.ndarray:
-    diff = positions[None, :, :] - positions[:, None, :]  # (N, N, 2)
+    diff = positions[:, None, :] - positions[None, :, :]  # (N, N, 2)
     diff -= np.round(diff)
     dist = np.linalg.norm(diff, axis=-1)  # (N, N)
 
@@ -52,39 +56,89 @@ def compute_forces(
     return force
 
 
+def compute_forces_cell_list(
+    positions: np.ndarray, cell_list: CellList, colour_pairs: np.ndarray, beta: float = 0.3
+) -> np.ndarray:
+    force = np.zeros_like(positions)
+    for cell_id in cell_list.all_cells:
+        cell_particles = cell_list.get_particles_in_cell(cell_id)
+
+        if cell_particles.size == 0:
+            continue
+
+        neighbour_cell_ids = cell_list.get_cell_neighbours(cell_id=cell_id)
+
+        candidates = np.concatenate([cell_list.get_particles_in_cell(c) for c in neighbour_cell_ids])
+
+        cell_positions = positions[cell_particles]
+        neighbour_positions = positions[candidates]
+
+        diff = cell_positions[:, None, :] - neighbour_positions[None, :, :]  # (N_i, N_j, 2)
+
+        diff -= np.round(diff)
+        dist = np.linalg.norm(diff, axis=-1)  # (N_i, N_j)
+
+        min_dist = 1e-3
+        dist_safe = np.where(dist < min_dist, min_dist, dist)
+
+        r_scaled = dist_safe / ForceSettings.r_max
+
+        relevant_colour_pairs = colour_pairs[np.ix_(cell_particles, candidates)]  # (N_i, N_j)
+
+        force_mag = force_func(r_scaled, relevant_colour_pairs, beta)
+
+        self_mask = cell_particles[:, None] == candidates[None, :]
+        force_mag = np.where(self_mask, 0.0, force_mag)
+
+        direction = diff / dist_safe[..., None]  # (N_i, N_j, 2)
+        force[cell_particles] += (direction * force_mag[..., None]).sum(axis=1)  # (N_i, 2)
+
+    return force
+
+
 def test_cell_grid() -> None:
-    num_cells = 1 // ForceSettings.r_max
-    cell_size = 1 / num_cells
+    num_cells = int(1 // ForceSettings.r_max)
+    num_colours = 5
+    # num_particles = 800
+    beta = 0.3
 
-    # rng = np.random.default_rng(seed=100)
+    particle_nums = np.arange(1500, step=100)
+    n2_times = []
+    cell_times = []
 
-    # positions = rng.random(size=(10, 2))
+    for num_particles in particle_nums:
+        rng = np.random.default_rng(seed=100)
+        positions = rng.random(size=(num_particles, 2))
+        # positions = np.array([[0.45, 0.36], [0.75, 0.12], [0.46, 0.34], [0.96, 0.44], [0.99999, 0.99999]])
 
-    positions = np.array([[0.45, 0.36], [0.75, 0.12], [0.46, 0.34], [0.96, 0.44], [0.99999, 0.99999]])
+        colours = np.random.randint(0, num_colours, size=(num_particles,))
 
-    cell_coords = (positions // cell_size).astype(int)
-    cell_ids = cell_coords[:, 0] * num_cells + cell_coords[:, 1]
+        attraction_matrix = np.random.uniform(-1, 1, size=(num_colours, num_colours))
 
-    order = np.argsort(cell_ids)
-    sorted_cell_ids = cell_ids[order]
+        colour_pairs = attraction_matrix[colours[:, None], colours[None, :]]
 
-    cell_starts = np.searchsorted(sorted_cell_ids, np.arange(num_cells**2), side="left")
-    cell_ends = np.searchsorted(sorted_cell_ids, np.arange(num_cells**2), side="right")
+        cell_list = CellList(num_cells=num_cells)
+        cell_list.build(positions)
 
-    # def get_neighbours(cell_coords: np.ndarray):
-    dirs = [-1, 0, 1]
+        n2_time = timeit.timeit(lambda: compute_forces(positions, colour_pairs, beta=beta), number=10)
+        cell_time = timeit.timeit(
+            lambda: compute_forces_cell_list(positions, cell_list, colour_pairs, beta=beta), number=10
+        )
 
-    offsets = np.array([[dx, dy] for dx in dirs for dy in dirs])
-    neighbours = (cell_coords[:, None, :] + offsets[None, :, :]) % num_cells
+        n2_times.append(n2_time / 10 * 1000)
+        cell_times.append(cell_time / 10 * 1000)
 
-    neighbour_cell_ids = (neighbours[..., 0] * num_cells + neighbours[..., 1]).astype(int)
+        # print(f"N² version:    {n2_time / 10 * 1000:.3f} ms/call")
+        # print(f"Grid version:   {cell_time / 10 * 1000:.3f} ms/call")
 
-    cell_ids_for_i = neighbour_cell_ids[-1].astype(int)
-    candidates = np.concatenate([order[cell_starts[c] : cell_ends[c]] for c in cell_ids_for_i])
+    plt.plot(particle_nums, n2_times, label="O($N^2$)", color="gray")
+    plt.plot(particle_nums, cell_times, label="Cell-List Algorithm", color="red")
 
-    print(candidates)
+    plt.xlabel("Number of particles", fontsize=14)
+    plt.ylabel("Time (ms/call)", fontsize=14)
 
-    print(neighbour_cell_ids)
+    plt.legend()
+    plt.show()
 
 
 if __name__ == "__main__":
