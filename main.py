@@ -1,26 +1,8 @@
-import numpy as np
-
 from particle_life import ParticleSystem, SoftwareRender
 
 
 def main() -> None:
-    num_particles = 500
-    num_colours = 5
-
-    positions = np.random.rand(num_particles, 2)
-    velocities = np.random.rand(num_particles, 2)
-    colours = np.random.randint(0, num_colours, size=(num_particles,))
-
-    attraction_matrix = np.random.uniform(-1, 1, size=(num_colours, num_colours))
-
-    colour_pairs = attraction_matrix[colours[:, None], colours[None, :]]
-
-    particle_system = ParticleSystem(
-        positions=positions,
-        velocities=velocities,
-        colours=colours,
-        colour_pairs=colour_pairs,
-    )
+    particle_system = ParticleSystem.from_setup(n_particles=2000, n_colours=5, seed=10)
 
     app = SoftwareRender(particle_system=particle_system)
     app.run()
