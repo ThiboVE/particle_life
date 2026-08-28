@@ -20,7 +20,8 @@ class CellList:
 
         self.all_cells = np.arange(self.num_cells**2, dtype=int)
 
-    def get_offsets(self) -> np.ndarray:
+    @staticmethod
+    def get_offsets() -> np.ndarray:
         dirs = [-1, 0, 1]
         return np.array([[dx, dy] for dx in dirs for dy in dirs])  # (9, 2)
 
