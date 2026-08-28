@@ -13,7 +13,6 @@ class ForceSettings:
     r_max: float = 0.15
     frictionHalfLife: float = 0.040
     frictionFactor: float = pow(0.5, dt / frictionHalfLife)
-    forceFactor: int = 40
 
 
 def force_func(dist: np.ndarray, interaction: np.ndarray, beta: float = 0.3) -> np.ndarray:
@@ -39,7 +38,7 @@ def compute_forces(
     type_pairs: np.ndarray,
     beta: float = 0.3,
 ) -> np.ndarray:
-    diff = positions[:, None, :] - positions[None, :, :]  # (N, N, 2)
+    diff = positions[None, :, :] - positions[:, None, :]  # (N, N, 2)
     diff -= np.round(diff)
     dist = np.linalg.norm(diff, axis=-1)  # (N, N)
 
@@ -57,7 +56,7 @@ def compute_forces(
 
 
 def compute_forces_cell_list(
-    positions: np.ndarray, cell_list: CellList, colour_pairs: np.ndarray, beta: float = 0.3
+    positions: np.ndarray, colour_pairs: np.ndarray, cell_list: CellList, beta: float = 0.3
 ) -> np.ndarray:
     force = np.zeros_like(positions)
     for cell_id in cell_list.all_cells:
@@ -73,7 +72,7 @@ def compute_forces_cell_list(
         cell_positions = positions[cell_particles]
         neighbour_positions = positions[candidates]
 
-        diff = cell_positions[:, None, :] - neighbour_positions[None, :, :]  # (N_i, N_j, 2)
+        diff = neighbour_positions[None, :, :] - cell_positions[:, None, :]  # (N_i, N_j, 2)
 
         diff -= np.round(diff)
         dist = np.linalg.norm(diff, axis=-1)  # (N_i, N_j)
@@ -122,7 +121,7 @@ def test_cell_grid() -> None:
 
         n2_time = timeit.timeit(lambda: compute_forces(positions, colour_pairs, beta=beta), number=10)
         cell_time = timeit.timeit(
-            lambda: compute_forces_cell_list(positions, cell_list, colour_pairs, beta=beta), number=10
+            lambda: compute_forces_cell_list(positions, colour_pairs, cell_list, beta=beta), number=10
         )
 
         n2_times.append(n2_time / 10 * 1000)

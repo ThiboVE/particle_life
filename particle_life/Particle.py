@@ -1,9 +1,11 @@
 from collections.abc import Generator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Self
 
 import numpy as np
 
-from particle_life.force import ForceSettings, compute_forces
+from particle_life.CellList import CellList
+from particle_life.force import ForceSettings, compute_forces_cell_list
 
 
 @dataclass
@@ -27,17 +29,36 @@ class Particle:
         )
 
 
-# TODO: add CellList to ParticleSystem
-# TODO: Change update method to use cell list algo
-# TODO: maybe incorporate position, colour and attraction matrix instantion in this class
-
-
 @dataclass
 class ParticleSystem:
     positions: np.ndarray  # (N, 2)
     velocities: np.ndarray  # (N, 2)
     colours: np.ndarray  # (N,)
     colour_pairs: np.ndarray  # (N, N)
+
+    cell_list: CellList = field(init=False)
+
+    def __post_init__(self) -> None:
+        num_cells = int(1 // ForceSettings.r_max)
+        self.cell_list = CellList(num_cells)
+
+    @classmethod
+    def from_setup(
+        cls,
+        n_particles: int,
+        n_colours: int,
+        seed: int | None = None,
+    ) -> Self:
+        rng = np.random.default_rng(seed or 42)
+
+        positions = rng.uniform(0, 1, size=(n_particles, 2))
+        velocities = rng.uniform(0, 1, size=(n_particles, 2))
+        colours = rng.integers(0, n_colours, size=n_particles)
+
+        attraction_matrix = rng.uniform(-1, 1, size=(n_colours, n_colours))
+        colour_pairs = attraction_matrix[colours[:, None], colours[None, :]]
+
+        return cls(positions=positions, velocities=velocities, colours=colours, colour_pairs=colour_pairs)
 
     def __len__(self) -> int:
         return len(self.positions)
@@ -55,16 +76,13 @@ class ParticleSystem:
             yield self.__getitem__(i)
 
     def update(self, dt: float = 0.02, beta: float = 0.3) -> None:
-        force = compute_forces(self.positions, self.colour_pairs, beta=beta)
+        self.cell_list.build(self.positions)
 
-        positions = self.positions
-        velocities = self.velocities
+        force = compute_forces_cell_list(self.positions, self.colour_pairs, cell_list=self.cell_list, beta=beta)
+        # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
 
-        velocities *= ForceSettings.frictionFactor
-        velocities += force * dt
+        self.velocities *= ForceSettings.frictionFactor
+        self.velocities += force * dt
 
-        positions += velocities * dt
-        positions %= 1.0
-
-        self.positions = positions
-        self.velocities = velocities
+        self.positions += self.velocities * dt
+        self.positions %= 1.0
