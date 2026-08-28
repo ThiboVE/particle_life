@@ -27,6 +27,11 @@ class Particle:
         )
 
 
+# TODO: add CellList to ParticleSystem
+# TODO: Change update method to use cell list algo
+# TODO: maybe incorporate position, colour and attraction matrix instantion in this class
+
+
 @dataclass
 class ParticleSystem:
     positions: np.ndarray  # (N, 2)
