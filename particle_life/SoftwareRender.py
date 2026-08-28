@@ -16,7 +16,6 @@ colourdict = {
 
 class SoftwareRender:
     def __init__(self, particle_system: ParticleSystem) -> None:
-        # variables needed to initialize a pygame window
         pg.init()
         self.RES = self.WIDTH, self.HEIGHT = 1200, 720
         self.FPS = 60
@@ -25,16 +24,15 @@ class SoftwareRender:
 
         self.particle_system = particle_system
 
-    def update(self):
+    def update(self) -> None:
         pg.display.set_caption(str(round(self.clock.get_fps(), 5)))
         pg.display.flip()
         self.clock.tick(self.FPS)
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill((10, 0, 10))
 
-        for i in range(len(self.particle_system)):
-            particle = self.particle_system[i]
+        for particle in self.particle_system:
             x, y = particle.position[0] * self.WIDTH, particle.position[1] * self.HEIGHT
 
             pg.draw.circle(
@@ -44,12 +42,12 @@ class SoftwareRender:
                 particle.radius,
             )
 
-    def check_events(self):
+    def check_events(self) -> None:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 sys.exit()
 
-    def run(self):
+    def run(self) -> None:
         while True:
             self.check_events()
             self.draw()
