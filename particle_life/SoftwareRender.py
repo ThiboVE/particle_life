@@ -47,6 +47,10 @@ class SoftwareRender:
             if event.type == pg.QUIT:
                 sys.exit()
 
+            if event.type == pg.VIDEORESIZE:
+                self.WIDTH = event.w
+                self.HEIGHT = event.h
+
     def run(self) -> None:
         while True:
             self.check_events()
