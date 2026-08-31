@@ -78,7 +78,9 @@ class ParticleSystem:
     def update(self, dt: float = 0.02, beta: float = 0.3) -> None:
         self.cell_list.build(self.positions)
 
-        force = compute_forces_cell_list(self.positions, self.colour_pairs, cell_list=self.cell_list, beta=beta)
+        force = compute_forces_cell_list(
+            positions=self.positions, colour_pairs=self.colour_pairs, cell_list=self.cell_list, beta=beta
+        )
         # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
 
         self.velocities *= ForceSettings.frictionFactor
