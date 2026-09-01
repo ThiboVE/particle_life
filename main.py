@@ -2,7 +2,7 @@ from particle_life import ParticleSystem, SoftwareRender
 
 
 def main() -> None:
-    particle_system = ParticleSystem.from_setup(n_particles=1000, n_colours=5, seed=1000)
+    particle_system = ParticleSystem.from_setup(n_particles=1000, n_colours=4, seed=7)
 
     app = SoftwareRender(particle_system=particle_system)
     app.run()

@@ -11,7 +11,8 @@ from particle_life.CellList import CellList
 class ForceSettings:
     dt: float = 0.02
     r_max: float = 0.15
-    frictionHalfLife: float = 0.040
+    # frictionHalfLife: float = 0.040
+    frictionHalfLife: float = 0.030
     frictionFactor: float = pow(0.5, dt / frictionHalfLife)
 
 

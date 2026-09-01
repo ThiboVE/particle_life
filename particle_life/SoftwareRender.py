@@ -30,7 +30,7 @@ class SoftwareRender:
         self.clock.tick(self.FPS)
 
     def draw(self) -> None:
-        self.screen.fill((10, 0, 10))
+        self.screen.fill((0, 0, 0))
 
         for particle in self.particle_system:
             x, y = particle.position[0] * self.WIDTH, particle.position[1] * self.HEIGHT
@@ -64,5 +64,5 @@ class SoftwareRender:
 
             self.update()
 
-            print(f"drawing: {(t1 - t0):2f}")
-            print(f"physics: {(t2 - t1):2f}")
+            # print(f"drawing: {(t1 - t0):2f}")
+            # print(f"physics: {(t2 - t1):2f}")
