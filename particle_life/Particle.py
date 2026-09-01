@@ -77,12 +77,13 @@ class ParticleSystem:
             yield self.__getitem__(i)
 
     def update(self, dt: float = 0.02, beta: float = 0.3) -> None:
-        self.cell_list.build(self.positions)
+        # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
+
+        # self.cell_list.build(self.positions)
 
         # force = compute_forces_cell_list(
         #     positions=self.positions, colour_pairs=self.colour_pairs, cell_list=self.cell_list, beta=beta
         # )
-        # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
 
         force = np.array(compute_forces_jax(jnp.array(self.positions), jnp.array(self.colour_pairs), beta=beta))
 
