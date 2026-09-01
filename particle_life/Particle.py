@@ -84,10 +84,7 @@ class ParticleSystem:
         # )
         # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
 
-        jnp_positions = jnp.array(self.positions)
-        jnp_colour_pairs = jnp.array(self.colour_pairs)
-
-        force = np.array(compute_forces_jax(jnp_positions, jnp_colour_pairs, beta=beta))
+        force = np.array(compute_forces_jax(jnp.array(self.positions), jnp.array(self.colour_pairs), beta=beta))
 
         self.velocities *= ForceSettings.frictionFactor
         self.velocities += force * dt
