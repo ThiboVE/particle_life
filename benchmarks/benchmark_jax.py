@@ -7,7 +7,7 @@ from particle_life import CellList, compute_forces, compute_forces_cell_list, co
 
 
 def test_jax() -> None:
-    NUM_PARTICLES = 1000
+    NUM_PARTICLES = 2000
     NUM_COLOURS = 3
     rng = np.random.default_rng(42)
 

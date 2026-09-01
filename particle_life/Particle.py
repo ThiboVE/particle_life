@@ -2,10 +2,11 @@ from collections.abc import Generator
 from dataclasses import dataclass, field
 from typing import Self
 
+import jax.numpy as jnp
 import numpy as np
 
 from particle_life.CellList import CellList
-from particle_life.force import ForceSettings, compute_forces_cell_list
+from particle_life.force import ForceSettings, compute_forces_jax
 
 
 @dataclass
@@ -78,10 +79,15 @@ class ParticleSystem:
     def update(self, dt: float = 0.02, beta: float = 0.3) -> None:
         self.cell_list.build(self.positions)
 
-        force = compute_forces_cell_list(
-            positions=self.positions, colour_pairs=self.colour_pairs, cell_list=self.cell_list, beta=beta
-        )
+        # force = compute_forces_cell_list(
+        #     positions=self.positions, colour_pairs=self.colour_pairs, cell_list=self.cell_list, beta=beta
+        # )
         # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
+
+        jnp_positions = jnp.array(self.positions)
+        jnp_colour_pairs = jnp.array(self.colour_pairs)
+
+        force = np.array(compute_forces_jax(jnp_positions, jnp_colour_pairs, beta=beta))
 
         self.velocities *= ForceSettings.frictionFactor
         self.velocities += force * dt
