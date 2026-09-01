@@ -76,7 +76,7 @@ class ParticleSystem:
         for i in range(len(self.positions)):
             yield self.__getitem__(i)
 
-    def update(self, dt: float = 0.02, beta: float = 0.3) -> None:
+    def update(self, dt: float = 0.01, beta: float = 0.3) -> None:
         # force = compute_forces(self.positions, self.colour_pairs, beta=beta)
 
         # self.cell_list.build(self.positions)

@@ -1,5 +1,6 @@
 import sys
 import time
+
 import pygame as pg
 
 from particle_life.Particle import ParticleSystem
@@ -54,6 +55,7 @@ class SoftwareRender:
     def run(self) -> None:
         while True:
             self.check_events()
+            self.update()
 
             t0 = time.perf_counter()
             self.draw()
@@ -61,8 +63,6 @@ class SoftwareRender:
 
             self.particle_system.update()
             t2 = time.perf_counter()
-
-            self.update()
 
             # print(f"drawing: {(t1 - t0):2f}")
             # print(f"physics: {(t2 - t1):2f}")
