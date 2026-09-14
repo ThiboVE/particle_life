@@ -23,6 +23,7 @@ Particle life is very computationally heavy, as each frame, for each particle, t
 Clone this repository, and set the current working directory to the root of the project:
 
 `git clone https://github.com/ThiboVE/particle_life.git`
+
 `cd particle_life`
 
 Run the project: 
